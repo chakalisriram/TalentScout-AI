@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentScout AI | Enterprise Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); }
+        .score-bar-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pulse-ring { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <nav class="glass-header sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-brand-600 text-white p-2 rounded-lg"><i class="fa-solid fa-robot"></i></div>
+                <span class="font-bold text-xl tracking-tight text-slate-900">TalentScout <span class="text-brand-600">AI</span></span>
+            </div>
+            <div class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
+                <i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Elite Edition
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-5xl mx-auto w-full px-6 py-8">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 transition-all hover:shadow-md">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-briefcase text-slate-400 mr-2"></i>Target Role Configuration</h2>
+                    <p class="text-sm text-slate-500 mt-1">Paste the job description below to initiate the autonomous scouting agent.</p>
+                </div>
+            </div>
+            <textarea id="jdInput" rows="4" 
+                class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm text-slate-700 font-medium placeholder-slate-400" 
+                placeholder="e.g., We are looking for a Senior Backend Engineer with strong Python, FastAPI, and Docker experience. Must be able to join immediately..."></textarea>
+            
+            <div class="flex justify-end mt-4">
+                <button onclick="runScout()" id="scoutBtn" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-lg transition duration-200 shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-radar text-white pulse-ring"></i> Deploy Agent
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden flex-col items-center justify-center py-16">
+            <div class="relative w-16 h-16">
+                <div class="absolute inset-0 border-4 border-slate-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-brand-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <h3 class="mt-6 text-lg font-semibold text-slate-800">Agent is actively scouting...</h3>
+            <p class="text-sm text-slate-500 mt-2 max-w-sm text-center">Parsing requirements, matching candidates, and conducting simulated conversational outreach.</p>
+        </div>
+
+        <div id="results" class="space-y-6">
+            </div>
+
+    </main>
+
+    <script>
+        // Helper function to render progress bars
+        function renderScore(label, score, colorClass) {
+            return `
+                <div class="mb-3 last:mb-0">
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                        <span class="text-slate-500 uppercase tracking-wider">${label}</span>
+                        <span class="text-slate-800">${score}/100</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                        <div class="bg-${colorClass} h-2 rounded-full score-bar-fill" style="width: ${score}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function runScout() {
+            const jdText = document.getElementById('jdInput').value;
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+            const btn = document.getElementById('scoutBtn');
+            
+            if (!jdText) { alert("Please provide a Job Description."); return; }
+
+            // UI Loading State
+            resultsDiv.innerHTML = '';
+            loadingDiv.classList.remove('hidden');
+            loadingDiv.classList.add('flex');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+
+            try {
+                const response = await fetch('/scout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: jdText })
+                });
+
+                if (!response.ok) throw new Error("Backend connection failed.");
+                
+                const data = await response.json();
+                
+                // UI Reset State
+                loadingDiv.classList.add('hidden');
+                loadingDiv.classList.remove('flex');
+                btn.innerHTML = '<i class="fa-solid fa-radar text-white"></i> Deploy Agent';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+
+                if (data.results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="text-center py-10 bg-white rounded-xl border border-slate-200"><i class="fa-solid fa-inbox text-4xl text-slate-300 mb-3"></i><p class="text-slate-500 font-medium">No suitable candidates found.</p></div>';
+                    return;
+                }
+
+                data.results.forEach((c, index) => {
+                    const isTop = index === 0;
+                    const badge = isTop ? `<span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 ml-3 shadow-sm"><i class="fa-solid fa-crown mr-1"></i>Top Recommendation</span>` : '';
+                    
+                    const card = `
+                    <div class="bg-white rounded-xl shadow-sm border ${isTop ? 'border-brand-400 ring-1 ring-brand-400' : 'border-slate-200'} overflow-hidden flex flex-col md:flex-row">
+                        
+                        <div class="w-full md:w-1/3 bg-slate-50 p-6 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 text-xl font-bold mr-4">
+                                        ${c.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-slate-900 leading-tight">${c.name}</h3>
+                                        <div class="mt-1">${badge}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Verified Skills</p>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        ${c.skills.map(s => `<span class="bg-white border border-slate-200 text-slate-600 text-xs px-2 py-1 rounded-md shadow-sm">${s}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <div class="text-center mb-4 pb-4 border-b border-slate-100">
+                                    <span class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Catalyst Final Score</span>
+                                    <span class="text-3xl font-black text-brand-600">${c.final_score}</span>
+                                </div>
+                                ${renderScore('Match Logic (70%)', c.match_score, 'blue-500')}
+                                ${renderScore('Agent Interest (30%)', c.interest_score, 'purple-500')}
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-2/3 p-6 flex flex-col">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                                    <div class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 flex items-center gap-1"><i class="fa-solid fa-microchip"></i> Match Reasoning</div>
+                                    <p class="text-sm text-blue-900 leading-relaxed">${c.match_reason}</p>
+                                </div>
+                                <div class="bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                    <div class="text-xs font-bold text-purple-700 uppercase tracking-wider mb-1 flex items-center gap-1"><i class="fa-solid fa-heart-pulse"></i> Interest Reasoning</div>
+                                    <p class="text-sm text-purple-900 leading-relaxed">${c.interest_reason}</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
+                                    <i class="fa-regular fa-comments"></i> Simulated Outreach Transcript
+                                </h4>
+                                <div class="space-y-4">
+                                    <div class="flex gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs shadow-sm flex-shrink-0"><i class="fa-solid fa-robot"></i></div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-500 mb-1">AI Recruiter</div>
+                                            <div class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-2xl rounded-tl-none text-sm border border-slate-200">
+                                                ${c.outreach}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 flex-row-reverse text-right">
+                                        <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 text-xs font-bold shadow-sm flex-shrink-0">${c.name.charAt(0)}</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-500 mb-1">Candidate</div>
+                                            <div class="bg-brand-50 text-brand-900 px-4 py-2.5 rounded-2xl rounded-tr-none text-sm border border-brand-100 text-left">
+                                                ${c.simulated_reply}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    `;
+                    resultsDiv.innerHTML += card;
+                });
+
+            } catch (error) {
+                console.error(error);
+                loadingDiv.classList.add('hidden');
+                loadingDiv.classList.remove('flex');
+                btn.innerHTML = '<i class="fa-solid fa-radar"></i> Deploy Agent';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+                resultsDiv.innerHTML = `<div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm"><p class="font-bold">Execution Error</p><p>${error.message} Ensure the Python backend is running.</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>
