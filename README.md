@@ -207,19 +207,6 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## 👨‍💻 Author
-
-**Navaneeth Indarapu**
-
-* Final Year CSE (2026)
-* Passionate about DSA & Web Development
-
----
-
-## ⭐ Contribute
-
-Pull requests are welcome. For major changes, open an issue first.
-
 ---
 
 ## 📄 License
