@@ -1,14 +1,230 @@
-# AI-Powered Talent Scouting & Engagement Agent
 
-A prototype for the Catalyst AI Hackathon by Deccan AI that takes a Job Description (JD) as input, discovers matching candidates, engages them conversationally (simulated), and outputs a ranked shortlist scored on Match Score and Interest Score.
+# 🚀 AI-Powered Job Description Analyzer API
 
-## Files
+An intelligent backend system that analyzes job descriptions using **FastAPI + LangChain + Google Gemini AI**.
+It can extract skills, generate interview questions, and evaluate candidate-job fit.
 
-- `candidates.json`: 10 diverse mock candidate profiles
-- `main.py`: FastAPI backend with LangChain and Gemini 1.5 Flash implementation
-- `requirements.txt`: Python dependencies
-- `.env.example`: Example environment variables
-- `EXPLAINABILITY.md`: Detailed explanation of the explainability implementation
+---
+
+## 📌 Features
+
+* 🔍 Extract key skills from Job Descriptions
+* 🤖 Generate interview questions dynamically
+* 📊 Analyze JD and provide structured insights
+* ⚡ FastAPI-based high-performance backend
+* 🔗 Easily integrable with frontend apps (React, etc.)
+
+---
+
+## 🏗️ Tech Stack
+
+* **Backend:** FastAPI
+* **LLM:** Google Gemini (via LangChain)
+* **Framework:** LangChain
+* **Server:** Uvicorn
+* **Language:** Python
+
+---
+
+## 📂 Project Structure
+
+```
+.
+├── main.py
+├── requirements.txt
+├── .env
+├── README.md
+└── venv/
+```
+
+---
+
+## ⚙️ System Architecture
+
+```
+Client (Postman / Frontend)
+            |
+            v
+        FastAPI Server
+            |
+            v
+      LangChain Layer
+            |
+            v
+   Google Gemini API
+            |
+            v
+       Response Output
+```
+
+---
+
+## 🔁 Program Flow
+
+```
+1. User sends Job Description (JD)
+2. FastAPI receives request
+3. Input passed to LangChain
+4. Prompt formatted using template
+5. Gemini LLM processes request
+6. Response returned to FastAPI
+7. JSON response sent back to client
+```
+
+---
+
+## 📊 UML Diagram (Sequence Diagram)
+
+```
+User        FastAPI        LangChain        Gemini API
+ |             |               |                 |
+ |  Send JD    |               |                 |
+ |-----------> |               |                 |
+ |             | Process Req   |                 |
+ |             |-------------> |                 |
+ |             |               | Format Prompt   |
+ |             |               |---------------> |
+ |             |               |   Generate      |
+ |             |               | <-------------- |
+ |             | Get Response  |                 |
+ |             | <-------------|                 |
+ | JSON Output |               |                 |
+ | <-----------|               |                 |
+```
+
+---
+
+## 🧠 Example Use Cases
+
+* Resume vs JD matching
+* Skill extraction
+* Interview preparation
+* AI-powered HR tools
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file:
+
+```
+GOOGLE_API_KEY=your_api_key_here
+```
+
+---
+
+## ▶️ How to Run the Project
+
+### 1️⃣ Clone the Repository
+
+```
+git clone <your-repo-url>
+cd <project-folder>
+```
+
+---
+
+### 2️⃣ Create Virtual Environment
+
+```
+python -m venv venv
+```
+
+Activate:
+
+```
+venv\Scripts\activate   (Windows)
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+### 4️⃣ Run the Server
+
+```
+uvicorn main:app --reload
+```
+
+---
+
+### 5️⃣ Access API
+
+Open:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## 📬 Sample API Request
+
+**POST /analyze**
+
+```json
+{
+  "job_description": "We are looking for a Software Engineer..."
+}
+```
+
+---
+
+## 📤 Sample Response
+
+```json
+{
+  "skills": ["Python", "FastAPI", "DSA"],
+  "interview_questions": [
+    "Explain REST APIs",
+    "What is FastAPI?"
+  ]
+}
+```
+
+---
+
+## ⚠️ Notes
+
+* Ensure correct Python version (**3.10+ recommended**)
+* Install all dependencies properly
+* Keep API keys secure
+
+---
+
+## 🚀 Future Enhancements
+
+* Resume upload & matching
+* Scoring system (ATS-like)
+* Frontend dashboard
+* Deployment (AWS / Render / Vercel)
+
+---
+
+## 👨‍💻 Author
+
+**Navaneeth Indarapu**
+
+* Final Year CSE (2026)
+* Passionate about DSA & Web Development
+
+---
+
+## ⭐ Contribute
+
+Pull requests are welcome. For major changes, open an issue first.
+
+---
+
+## 📄 License
+
+This project is open-source and available under the MIT License.
 
 ## System Architecture
 
@@ -43,3 +259,11 @@ graph TD
     D --> G
     E --> G
     G -->|JSON Response| A
+
+
+
+
+
+
+
+
