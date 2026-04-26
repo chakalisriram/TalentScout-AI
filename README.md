@@ -1,5 +1,5 @@
 
-# 🚀 AI-Powered Job Description Analyzer API
+# 🚀 TalentScout-AI
 
 An intelligent backend system that analyzes job descriptions using **FastAPI + LangChain + Google Gemini AI**.
 It can extract skills, generate interview questions, and evaluate candidate-job fit.
